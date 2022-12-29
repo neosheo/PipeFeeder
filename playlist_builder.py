@@ -24,25 +24,25 @@ def getChannelFeed(channel=None):
     return feed.text
 
 
-def getThisWeeksUploads(feed):
+def getUploads(feed):
     now = datetime.now()
-    week = timedelta(weeks = 1)
+    period = timedelta(weeks = 1)
     feed_soup = BeautifulSoup(feed, 'xml')
     # parse the video urls and  dates published
     # remove first date entry which is the channel published date
     pub_dates = feed_soup.find_all('published')[1:]
     videos = feed_soup.find_all('media:content')
-    # check if videos are over a week old
-    # if they are less than a week old, include them
+    # check if videos are were published before your specified period 
+    # if they are within your specified period, include them
     index = 0
     new_videos = []
     for pub_date in pub_dates:
-        if week < now - datetime.strptime(pub_date.text.replace('T', ' ').split('+')[0], '%Y-%m-%d %H:%M:%S'):
+        if period < now - datetime.strptime(pub_date.text.replace('T', ' ').split('+')[0], '%Y-%m-%d %H:%M:%S'):
             continue
         else:
             new_videos.append(videos[index])
         index += 1
-    # extract video url
+    # extract video urls
     urls = [new_video.attrs['url'].split('?')[0] for new_video in new_videos]
     for url in urls:
         with open('.urls', 'a') as f:
@@ -55,14 +55,14 @@ def buildPlaylist():
         subscriptions = f.readlines()
     for subscription in subscriptions:
         feed = getChannelFeed(subscription)
-        getThisWeeksUploads(feed)
+        getUploads(feed)
 
 
 def downloadPlaylist():
 	with open('.urls', 'r') as f:
 		urls = f.readlines()
 	for url in urls:
-		subprocess.run(['./download_song.sh', f'{url.rstrip()}'])
+		subprocess.run(['./download_file.sh', f'{url.rstrip()}'])
 
 
 if __name__ == '__main__':
