@@ -1,5 +1,3 @@
-#!/home/john/MEGAsync/Projects/Scrapers/PipeFeeder/venv/bin/python3.11
-
 import requests
 from bs4 import BeautifulSoup
 import subprocess
