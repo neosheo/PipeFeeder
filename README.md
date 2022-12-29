@@ -6,7 +6,8 @@
 ```
 pip install -r requirements.txt
 ```
-4. Set up a cronjob to run ```build_playlist.py``` once a week.
+4. Create a file called ```.subs``` that are YouTube channel URLs, one URL per line (i.e. https://www.youtube.com/c/warprecords).
+5. Set up a cronjob to run ```build_playlist.py``` once a week.
 
 # TWEAKS
 
