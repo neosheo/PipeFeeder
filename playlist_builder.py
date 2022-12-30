@@ -9,15 +9,23 @@ from datetime import datetime, timedelta
 def getChannelFeed(channel=None):
     # get the html of the requested youtube channel
     if channel:
-        chan_url = channel
+        chan_url = channel.rstrip()
     else:
         chan_url = input('Enter a youtube channel link: ')
-    chan_html = requests.get(chan_url).text
-    # find the channel id
-    browse_id_index = chan_html.find('browse_id')
-    id_start = browse_id_index + 20
-    id_end = browse_id_index + 44
-    chan_id = chan_html[id_start:id_end]
+	# find the channel id
+    if '/channel/' in chan_url:
+        chan_id = chan_url.split('/')[-1].rstrip()
+    elif '/c/' in chan_url:	
+        chan_html = requests.get(chan_url).text
+        browse_id_index = chan_html.find('browse_id')
+        id_start = browse_id_index + 20
+        id_end = browse_id_index + 44
+        chan_id = chan_html[id_start:id_end]
+    elif '@' in chan_url:
+        chan_html = requests.get(chan_url).text
+        chan_soup = BeautifulSoup(chan_html, 'html.parser')
+        alt_chan_url = chan_soup.find('link', rel='canonical')['href']
+        chan_id = alt_chan_url.split('/')[-1].rstrip()
     # get the rss feed for the channel
     feed_url = f'https://youtube.com/feeds/videos.xml?channel_id={chan_id}'
     feed = requests.get(feed_url)
