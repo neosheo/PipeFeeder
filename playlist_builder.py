@@ -32,7 +32,7 @@ def getChannelFeed(channel=None):
 
 def getUploads(feed):
     now = datetime.now()
-    period = timedelta(weeks = 1)
+    period = timedelta(days = 1)
     feed_soup = BeautifulSoup(feed, 'xml')
     # parse the video urls and  dates published
     # remove first date entry which is the channel published date
