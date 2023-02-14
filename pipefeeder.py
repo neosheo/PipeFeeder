@@ -73,7 +73,7 @@ def buildPlaylist():
         subscriptions = f.readlines()
     for subscription in subscriptions:
         feed = getChannelFeed(subscription)
-        getUploads(feed)
+        getRecentUploads(feed)
 
 
 def downloadPlaylist():
