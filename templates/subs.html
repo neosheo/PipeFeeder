@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Your Subscriptions</title>
+	<!--<link rel='stylesheet' type='text/css' href="static/styles.css">-->
+	<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+</head>
+
+<body>
+	<h1><center>Channels you've subscribed to:</center></h1>
+	{% if subs %}
+		{% for sub in subs %}
+			<div class='entry' style='border-style: groove;'>
+				<div class='title'>
+					<a href={{ sub['url'] }}>
+						<h3><center>{{ sub['channel_name'] }}<center></h3>
+					</a>
+				</div>
+			</div>
+			<br>
+		{% endfor %}
+	{% else %}
+		<h2><center>No subs to display<center></h2>
+	{% endif %}
+</body>
+</html>

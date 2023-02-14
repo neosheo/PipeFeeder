@@ -30,7 +30,7 @@ def getChannelFeed(channel=None):
     # get the rss feed for the channel
     feed_url = f'https://youtube.com/feeds/videos.xml?channel_id={chan_id}'
     feed = requests.get(feed_url)
-#    print(feed.text)
+    #print(feed.text)
     return feed.text
 
 
@@ -42,7 +42,7 @@ def getChannelId(feed):
     return BeautifulSoup(feed, 'xml').find_all('yt:channelId')[1].text
 
 
-def getUploads(feed):
+def getRecentUploads(feed):
     now = datetime.now()
     period = timedelta(days = 1)
     feed_soup = BeautifulSoup(feed, 'xml')
@@ -82,12 +82,11 @@ def downloadPlaylist():
 	for url in urls:
 		subprocess.run(['./download_file.sh', f'{url.rstrip()}'])
 
+
 def populateDb():
     with open('.subs', 'r') as f:
         subs = f.readlines()
-
     subscriptions = []
-
     print('Gathering subscriptions...')
     for sub in tqdm(subs):
         feed = getChannelFeed(sub)
@@ -96,15 +95,12 @@ def populateDb():
         url = sub.rstrip()
         subscriptions.append((channel_id, channel_name, url))
     print('Done!')
-
     print('Updating database...')
     con = sqlite3.connect('instance/subs.db')
     cur = con.cursor()
-
     cur.execute('DELETE FROM subs')
     con.commit()
     cur.execute('VACUUM')
-
     cur.executemany('INSERT INTO subs(channel_id, channel_name, url) VALUES (?, ?, ?)', subscriptions)
     con.commit()
     print('Done!')
@@ -112,11 +108,10 @@ def populateDb():
 #    print(res.fetchall())
 
 
-def create_db():
+def createDb():
     if os.path.isfile('instance/subs.db'):
         os.remove('instance/subs.db')
         con = sqlite3.connect('instance/subs.db')
-        cur = con.cursor()
-        cur.execute('CREATE TABLE subs(channel_id VARCHAR(24) PRIMARY KEY, channel_name VARCHAR(35), url VARCHAR(300))') 
+        con.cursor().execute('CREATE TABLE subs(channel_id VARCHAR(24) PRIMARY KEY, channel_name VARCHAR(35), url VARCHAR(300))') 
 
 
