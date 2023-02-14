@@ -4,6 +4,7 @@ import subprocess
 from datetime import datetime, timedelta
 from tqdm import tqdm
 import sqlite3
+import os
 
 
 def getChannelFeed(channel=None):
