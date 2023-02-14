@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import subprocess
 from datetime import datetime, timedelta
+from tqdm import tqdm
+import sqlite3
 
 
 def getChannelFeed(channel=None):
@@ -27,7 +29,16 @@ def getChannelFeed(channel=None):
     # get the rss feed for the channel
     feed_url = f'https://youtube.com/feeds/videos.xml?channel_id={chan_id}'
     feed = requests.get(feed_url)
+#    print(feed.text)
     return feed.text
+
+
+def getChannelName(feed):
+    return BeautifulSoup(feed, 'xml').find('title').text
+
+
+def getChannelId(feed):
+    return BeautifulSoup(feed, 'xml').find_all('yt:channelId')[1].text
 
 
 def getUploads(feed):
@@ -70,7 +81,41 @@ def downloadPlaylist():
 	for url in urls:
 		subprocess.run(['./download_file.sh', f'{url.rstrip()}'])
 
+def populateDb():
+    with open('.subs', 'r') as f:
+        subs = f.readlines()
 
-if __name__ == '__main__':
-	buildPlaylist()
-	downloadPlaylist()
+    subscriptions = []
+
+    print('Gathering subscriptions...')
+    for sub in tqdm(subs):
+        feed = getChannelFeed(sub)
+        channel_id = getChannelId(feed)
+        channel_name = getChannelName(feed)
+        url = sub.rstrip()
+        subscriptions.append((channel_id, channel_name, url))
+    print('Done!')
+
+    print('Updating database...')
+    con = sqlite3.connect('instance/subs.db')
+    cur = con.cursor()
+
+    cur.execute('DELETE FROM subs')
+    con.commit()
+    cur.execute('VACUUM')
+
+    cur.executemany('INSERT INTO subs(channel_id, channel_name, url) VALUES (?, ?, ?)', subscriptions)
+    con.commit()
+    print('Done!')
+#    res = cur.execute('SELECT * FROM subs')
+#    print(res.fetchall())
+
+
+def create_db():
+    if os.path.isfile('instance/subs.db'):
+        os.remove('instance/subs.db')
+        con = sqlite3.connect('instance/subs.db')
+        cur = con.cursor()
+        cur.execute('CREATE TABLE subs(channel_id VARCHAR(24) PRIMARY KEY, channel_name VARCHAR(35), url VARCHAR(300))') 
+
+

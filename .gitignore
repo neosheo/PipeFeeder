@@ -2,3 +2,5 @@ venv/
 .urls
 .subs
 Playlist/*
+__pycache__
+instance/*
