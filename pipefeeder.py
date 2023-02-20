@@ -34,6 +34,10 @@ def getChannelFeed(channel=None):
     return feed.text
 
 
+def getChannelUrl(feed):
+	return BeautifulSoup(feed, 'xml').find('uri').text
+
+
 def getChannelName(feed):
     return BeautifulSoup(feed, 'xml').find('title').text
 
@@ -92,8 +96,8 @@ def populateDb():
         feed = getChannelFeed(sub)
         channel_id = getChannelId(feed)
         channel_name = getChannelName(feed)
-        url = sub.rstrip()
-        subscriptions.append((channel_id, channel_name, url))
+        channel_url = sub.rstrip()
+        subscriptions.append((channel_id, channel_name, channel_url))
     print('Done!')
     print('Updating database...')
     con = sqlite3.connect('instance/subs.db')
@@ -101,7 +105,7 @@ def populateDb():
     cur.execute('DELETE FROM subs')
     con.commit()
     cur.execute('VACUUM')
-    cur.executemany('INSERT INTO subs(channel_id, channel_name, url) VALUES (?, ?, ?)', subscriptions)
+    cur.executemany('INSERT INTO subs(channel_id, channel_name, channel_url) VALUES (?, ?, ?)', subscriptions)
     con.commit()
     print('Done!')
 #    res = cur.execute('SELECT * FROM subs')
@@ -112,6 +116,6 @@ def createDb():
     if os.path.isfile('instance/subs.db'):
         os.remove('instance/subs.db')
         con = sqlite3.connect('instance/subs.db')
-        con.cursor().execute('CREATE TABLE subs(channel_id VARCHAR(24) PRIMARY KEY, channel_name VARCHAR(35), url VARCHAR(300))') 
+        con.cursor().execute('CREATE TABLE subs(channel_id VARCHAR(24) PRIMARY KEY, channel_name VARCHAR(35), channel_url VARCHAR(300))') 
 
 
