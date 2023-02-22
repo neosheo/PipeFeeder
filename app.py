@@ -1,22 +1,19 @@
-from flask import Flask, request, render_template
+from flask import render_template
 from website import create_app
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from pipefeeder import *
 
 
-app = create_app()
-db = SQLAlchemy(app)
+app, db = create_app()
 
 
 class Subs(db.Model):
-	channel_id = db.Column(db.String(24), primary_key=True)
-	channel_name = db.Column(db.String(35))
-	channel_url = db.Column(db.String(300))
-	channel_icon = db.Column(db.String(300))
-
-	def as_dict(self):
-		return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+         channel_id = db.Column(db.String(24), primary_key=True)
+         channel_name = db.Column(db.String(35))
+         channel_url = db.Column(db.String(300))
+         channel_icon = db.Column(db.String(300))
+         def as_dict(self):
+	         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
 
 @app.route('/', methods = ['GET'])
