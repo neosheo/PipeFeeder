@@ -1,11 +1,11 @@
 from flask import Flask, request, render_template
+from website import create_app
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from pipefeeder import *
 
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///subs.db'
+app = create_app()
 db = SQLAlchemy(app)
 
 
