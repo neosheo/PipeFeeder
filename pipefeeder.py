@@ -29,9 +29,9 @@ def getChannelFeed(channel=None):
         chan_id = alt_chan_url.split('/')[-1].rstrip()
     # get the rss feed for the channel
     feed_url = f'https://youtube.com/feeds/videos.xml?channel_id={chan_id}'
-    feed = requests.get(feed_url)
-    #print(feed.text)
-    return feed.text
+    feed = requests.get(feed_url).text
+    #print(feed)
+    return feed
 
 
 def getChannelUrl(feed):
@@ -45,6 +45,17 @@ def getChannelName(feed):
 def getChannelId(feed):
     return BeautifulSoup(feed, 'xml').find_all('yt:channelId')[1].text
 
+
+def getChannelIcon(channel_url):
+	channel_html = requests.get(channel_url).text
+	soup = BeautifulSoup(channel_html, 'html.parser')
+	links = soup.find_all('link')
+	for link in links:
+		if link['rel'][0] == 'image_src':
+			return link['href']
+		else:
+			continue
+	
 
 def getRecentUploads(feed):
     now = datetime.now()
@@ -97,7 +108,8 @@ def populateDb():
         channel_id = getChannelId(feed)
         channel_name = getChannelName(feed)
         channel_url = sub.rstrip()
-        subscriptions.append((channel_id, channel_name, channel_url))
+        channel_icon = getChannelIcon(channel_url)
+        subscriptions.append((channel_id, channel_name, channel_url, channel_icon))
     print('Done!')
     print('Updating database...')
     con = sqlite3.connect('instance/subs.db')
@@ -105,7 +117,7 @@ def populateDb():
     cur.execute('DELETE FROM subs')
     con.commit()
     cur.execute('VACUUM')
-    cur.executemany('INSERT INTO subs(channel_id, channel_name, channel_url) VALUES (?, ?, ?)', subscriptions)
+    cur.executemany('INSERT INTO subs(channel_id, channel_name, channel_url, channel_icon) VALUES (?, ?, ?, ?)', subscriptions)
     con.commit()
     print('Done!')
 #    res = cur.execute('SELECT * FROM subs')
@@ -116,6 +128,6 @@ def createDb():
     if os.path.isfile('instance/subs.db'):
         os.remove('instance/subs.db')
         con = sqlite3.connect('instance/subs.db')
-        con.cursor().execute('CREATE TABLE subs(channel_id VARCHAR(24) PRIMARY KEY, channel_name VARCHAR(35), channel_url VARCHAR(300))') 
+        con.cursor().execute('CREATE TABLE subs(channel_id VARCHAR(24) PRIMARY KEY, channel_name VARCHAR(35), channel_url VARCHAR(300), channel_icon VARCHAR(300))') 
 
 
