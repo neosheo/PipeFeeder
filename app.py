@@ -38,10 +38,9 @@ def addSub(channel_url):
     return render_template('subs.html', subs=subs_list)
 
 
-@app.route('/del_sub/<channel_id>', methods = ['POST'])
-def delSub(channel_id):
-	record_to_delete = db.session.get(f"'{channel_id}'")
-	db.session.delete(record_to_delete)
+@app.route('/del_sub', methods = ['POST'])
+def delSub():
+	db.session.query(Subs).filter_by(channel_id=request.form['Unsubscribe']).delete()
 	db.session.commit()
 	subs_list = [sub.as_dict() for sub in Subs.query.order_by(func.lower(Subs.channel_name)).all()]
 	return render_template('subs.html', subs=subs_list)

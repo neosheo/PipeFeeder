@@ -18,10 +18,10 @@
 		{% for sub in subs %}
 			<div class='entry' style='border-style: groove;'>
 				<div class='title'>
-					<form method="POST">
+					<form method='POST' action='/del_sub'>
 						<h2 align='center'>{{ sub['channel_name'] }}</h2>
 						<center><img src={{ sub['channel_icon'] }} width='200' height='200'></img></center>
-						<center><button type='button' onclick='deleteSub("{{ sub.channel_id }}")'>Unsubscribe</button></center>
+						<center><button type='submit' name='Unsubscribe' value={{ sub['channel_id'] }}>Unsubscribe</button></center>
 						<br>
 					</form>
 				</div>
