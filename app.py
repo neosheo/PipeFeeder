@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, request
 from website import create_app
 from sqlalchemy import func
 from pipefeeder import *
@@ -27,7 +27,7 @@ def listSubs():
 	return render_template('subs.html', subs=subs_list)
 
 
-@app.route('/add_sub/<channel_url>', methods = ['GET'])
+@app.route('/add_sub/<channel_url>', methods = ['POST'])
 def addSub(channel_url):
     channel_url = f'https://{channel_url}'
     feed = getChannelFeed(channel_url)
@@ -38,7 +38,7 @@ def addSub(channel_url):
     return render_template('subs.html', subs=subs_list)
 
 
-@app.route('/del_sub/<channel_id>', methods = ['GET'])
+@app.route('/del_sub/<channel_id>', methods = ['POST'])
 def delSub(channel_id):
 	record_to_delete = db.session.get(f"'{channel_id}'")
 	db.session.delete(record_to_delete)
