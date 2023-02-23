@@ -1,4 +1,4 @@
-from flask import render_template, request
+from flask import render_template, request, redirect
 from website import create_app
 from sqlalchemy import func
 from pipefeeder import *
@@ -43,4 +43,4 @@ def delSub():
 	db.session.query(Subs).filter_by(channel_id=request.form['Unsubscribe']).delete()
 	db.session.commit()
 	subs_list = [sub.as_dict() for sub in Subs.query.order_by(func.lower(Subs.channel_name)).all()]
-	return render_template('subs.html', subs=subs_list)
+	return redirect('/list_subs')
