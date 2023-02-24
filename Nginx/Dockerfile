@@ -11,7 +11,6 @@ ENV NGINX_VERSION   1.23.3
 ENV NJS_VERSION     0.7.9
 ENV PKG_RELEASE     1~bullseye
 
-RUN groupadd -r user && useradd -r -g user user
 RUN chsh -s /usr/sbin/nologin root
 RUN set -x \
 # create nginx user/group first, to be consistent throughout docker variants
