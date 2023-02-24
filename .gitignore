@@ -5,3 +5,5 @@ Playlist/*
 __pycache__
 instance/*
 shell*
+compose.yaml
+Nginx/
