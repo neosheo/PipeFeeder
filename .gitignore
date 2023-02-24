@@ -7,3 +7,4 @@ instance/*
 shell*
 compose.yaml
 Nginx/
+subs.db
