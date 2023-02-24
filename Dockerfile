@@ -9,7 +9,7 @@ ADD start_uwsgi.sh .
 ADD requirements.txt .
 ADD .subs .
 
-RUN groupadd -r pipefeeder && useradd -r -g pipefeeder pipefeeder
+RUN groupadd -r --gid 1000 pipefeeder && useradd -r --uid 1000 -g pipefeeder pipefeeder
 RUN chsh -s /usr/sbin/nologin root
 RUN apt update && apt install ffmpeg -y
 RUN touch /.urls
