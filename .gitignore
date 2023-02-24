@@ -4,4 +4,4 @@ venv/
 Playlist/*
 __pycache__
 instance/*
-start_db.py
+shell*

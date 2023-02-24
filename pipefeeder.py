@@ -114,10 +114,7 @@ def populateDb():
     print('Updating database...')
     con = sqlite3.connect('website/instance/subs.db')
     cur = con.cursor()
-    cur.execute('DELETE FROM subs')
-    cur.execute('DROP TABLE subs')
     con.commit()
-    cur.execute('VACUUM')
     cur.execute('CREATE TABLE subs(channel_id VARCHAR(24) PRIMARY KEY, channel_name VARCHAR(35), channel_url VARCHAR(300), channel_icon VARCHAR(300))') 
     cur.executemany('INSERT INTO subs(channel_id, channel_name, channel_url, channel_icon) VALUES (?, ?, ?, ?)', subscriptions)
     con.commit()
@@ -126,10 +123,6 @@ def populateDb():
 #    print(res.fetchall())
 
 
-def createDb():
-    if os.path.isfile('instance/subs.db'):
-        os.remove('instance/subs.db')
-        con = sqlite3.connect('instance/subs.db')
-        con.cursor().execute('CREATE TABLE subs(channel_id VARCHAR(24) PRIMARY KEY, channel_name VARCHAR(35), channel_url VARCHAR(300), channel_icon VARCHAR(300))') 
-
-
+if __name__ == '__main__':
+        buildPlaylist()
+        downloadPlaylist()

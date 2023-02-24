@@ -5,3 +5,4 @@ yt-dlp
 flask
 flask_sqlalchemy
 tqdm
+uwsgi
