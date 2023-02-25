@@ -84,8 +84,9 @@ def getRecentUploads(feed):
 
 def buildPlaylist():
     open('.urls', 'w').close()
-    with open('.subs', 'r') as f:
-        subscriptions = f.readlines()
+    con = sqlite3.connect('website/instance/subs.db')
+    subscriptions = con.cursor().execute('SELECT channel_url FROM subs')
+    #print(subscriptions.fetchall())
     for subscription in subscriptions:
         feed = getChannelFeed(subscription)
         getRecentUploads(feed)
@@ -114,7 +115,6 @@ def populateDb():
     print('Updating database...')
     con = sqlite3.connect('website/instance/subs.db')
     cur = con.cursor()
-    con.commit()
     cur.execute('CREATE TABLE subs(channel_id VARCHAR(24) PRIMARY KEY, channel_name VARCHAR(35), channel_url VARCHAR(300), channel_icon VARCHAR(300))') 
     cur.executemany('INSERT INTO subs(channel_id, channel_name, channel_url, channel_icon) VALUES (?, ?, ?, ?)', subscriptions)
     con.commit()
