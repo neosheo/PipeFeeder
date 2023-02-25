@@ -8,3 +8,5 @@ shell*
 compose.yaml
 Nginx/
 subs.db
+pipefeeder.log
+run.sh
