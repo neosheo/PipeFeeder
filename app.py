@@ -31,7 +31,7 @@ def listSubs():
 def addSub():
 	channel_url = request.form['subscribe']
 	feed = getChannelFeed(channel_url)
-	new_record = Subs(channel_id=getChannelId(feed), channel_name=getChannelName(feed), channel_url=channel_url, channel_icon=getChannelIcon(channel_url))
+	new_record = Subs(channel_id=getChannelId(feed), channel_name=getChannelName(feed), channel_url=getChannelUrl(feed), channel_icon=getChannelIcon(channel_url))
 	db.session.add(new_record)
 	db.session.commit()
 	return redirect('/list_subs')
