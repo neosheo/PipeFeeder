@@ -107,7 +107,7 @@ def populateDb():
         feed = getChannelFeed(sub)
         channel_id = getChannelId(feed)
         channel_name = getChannelName(feed)
-        channel_url = sub.rstrip()
+        channel_url = getChannelUrl(feed)
         channel_icon = getChannelIcon(channel_url)
         subscriptions.append((channel_id, channel_name, channel_url, channel_icon))
     print('Done!')
