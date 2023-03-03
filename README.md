@@ -6,17 +6,102 @@
 ```
 pip install -r requirements.txt
 ```
-4. Create a file called ```.subs``` that are YouTube channel URLs, one URL per line (i.e. https://www.youtube.com/c/warprecords).
-5. Set up a cronjob to run ```build_playlist.py``` once a week.
+Also make sure your distro has the following installed:
+```
+docker
+docker-compose
+ffmpeg
+```
+You may optionally want ```cron``` as well.
 
-# TWEAKS
+4. Create a file called ```.subs``` that includes at least 1 YouTube channel URL (i.e. https://www.youtube.com/c/warprecords).
 
-If you would like to change how frequently the script runs you can adjust the cronjob to run at different intervals and adjust the ```period``` variable in the ```getUploads()``` function.
+5. Create a file called ```nginx.conf``` in the pipefeeder directory. I recommend the following to the contents of this file:
 
-You do not have to use the yt-dlp installed via pip. If you already have it installed via a package manager you can remove that line from ```requirements.txt``` or simply install the dependencies you need manually.
+```
+http {
+	server {
+		include uwsgi_params;
 
-Each function can be called on its own. For example if you just want to get a feed of a YouTube channel you can call ```getChannelFeed()```. If you already have a feed and just want the uploads from your period you can call ```getUploads```.
+		location / {
+			uwsgi_pass pipefeeder:3031;
+		}
+	
+		location /list_subs {
+			uwsgi_pass pipefeeder:3031;
+		}
 
-The ```download_file.sh``` script can be run on its own provided you pass a url after calling the script.
+		location /add_sub {
+			uwsgi_pass pipefeeder:3031;
+		}
 
-Currently this script is designed to download music and downloads an mp3 by default. However, if you want to download videos you can tweak the options in the ```download_file.sh``` script.
+		location /del_sub {
+			uwsgi_pass pipefeeder:3031;
+		}
+	
+	}
+}
+events {}
+```
+
+6. Running the following command to start the container (NOTE: the build command may take a while):
+By default the user in the build file is set 1000:1000 you should adjust this to match your user accounts' uid and gid respectively so you can access the files from outside the container. Do so by editing the groupadd and useradd commands in the Dockerfile.
+Create a file called compose.yaml in the pipefeeder directory. The following is my recommended content for compose.yaml, feel free to tweak it to your needs.
+
+```
+version: '3.8'
+
+services:
+    nginx:
+        image: nginx:latest
+        container_name: pipefeeder-nginx
+        restart: unless-stopped
+        ports:
+            - 10003:80
+        volumes:
+            - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
+    pipefeeder:
+        build: .
+        image: pipefeeder:latest
+        container_name: pipefeeder
+        restart: unless-stopped
+        volumes:
+            - ./Playlist:/Playlist
+            - ./website/instance/:/website/instance/
+```
+
+7. Run ```docker compose up -d``` to build the image and start the container
+
+8. Navigate to ```http://localhost:10003/list_subs``` in your web browser. Here you can paste YouTube channel URLs at the top and press subscribe to add them. Click unsubscribe under a channel to remove it.
+
+9. I suggest adding a daily cronjob to your crontab. Below is an example:
+
+Create a run.sh in your pipefeeder directory like so:
+
+```
+#!/bin/bash
+
+log=./pipefeeder.log
+
+echo "$(date)" >> "$log"
+
+"$(which docker)" exec \
+	--user pipefeeder \
+	pipefeeder \
+	python -m pip install -U pip >> "$log" 2>&1 \
+	&& python -m pip install -U yt-dlp >> "$log" 2>&1
+
+"$(which docker)" exec \
+	--user pipefeeder \
+	pipefeeder \
+	python pipefeeder.py >> "$log" 2>&1
+
+echo >> "$log"
+```
+
+Then add this to your crontab (make sure to include the cd so the working directory is set correctly):
+
+```
+0 0 * * * cd /path/to/pipefeeder directory && ./run.sh
+```
