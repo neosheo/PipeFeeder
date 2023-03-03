@@ -10,7 +10,6 @@ Also make sure your distro has the following installed:
 ```
 docker
 docker-compose
-ffmpeg
 ```
 You may optionally want ```cron``` as well.
 
