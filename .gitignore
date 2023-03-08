@@ -10,5 +10,6 @@ Nginx/
 subs.db
 pipefeeder.log
 run.sh
-subs.bk subs.db.bk
+subs.bk
+subs.db.bk
 subs.txt
