@@ -4,7 +4,7 @@ ADD app.py .
 ADD pipefeeder.py .
 ADD download_file.sh .
 ADD website/ ./website/
-ADD Playlist/ ./Playlist
+ADD playlist/ ./playlist
 ADD backup/ ./backup/
 ADD start_uwsgi.sh .
 ADD requirements.txt .

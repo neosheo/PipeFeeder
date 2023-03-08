@@ -1,7 +1,8 @@
 venv/
 .urls
 .subs*
-Playlist/*
+playlist/*
+backup/*
 __pycache__
 instance/*
 shell*
