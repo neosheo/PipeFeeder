@@ -13,9 +13,7 @@ docker-compose
 ```
 You may optionally want ```cron``` as well.
 
-4. Create a file called ```.subs``` that includes at least 1 YouTube channel URL (i.e. https://www.youtube.com/c/warprecords).
-
-5. Create a file called ```nginx.conf``` in the pipefeeder directory. I recommend the following to the contents of this file:
+4. Create a file called ```nginx.conf``` in the pipefeeder directory. I recommend the following to the contents of this file:
 
 ```
 http {
@@ -37,13 +35,21 @@ http {
 		location /del_sub {
 			uwsgi_pass pipefeeder:3031;
 		}
+
+		location /upload_subs {
+			uwsgi_pass pipefeeder:3031;
+		}
+	
+		location /backup_subs {
+			uwsgi_pass pipefeeder:3031;
+		}
 	
 	}
 }
 events {}
 ```
 
-6. Running the following command to start the container (NOTE: the build command may take a while):
+5. Running the following command to start the container (NOTE: the build command may take a while):
 By default the user in the build file is set 1000:1000 you should adjust this to match your user accounts' uid and gid respectively so you can access the files from outside the container. Do so by editing the groupadd and useradd commands in the Dockerfile.
 Create a file called compose.yaml in the pipefeeder directory. The following is my recommended content for compose.yaml, feel free to tweak it to your needs.
 
@@ -65,16 +71,17 @@ services:
         image: pipefeeder:latest
         container_name: pipefeeder
         restart: unless-stopped
-        volumes:
-            - ./Playlist:/Playlist
-            - ./website/instance/:/website/instance/
+        volumes: 
+           - ./backup:/backup
+           - ./playlist:/playlist
+           - ./website/instance/:/website/instance/
 ```
 
-7. Run ```docker compose up -d``` to build the image and start the container
+6. Run ```docker compose up -d``` to build the image and start the container
 
-8. Navigate to ```http://localhost:10003/list_subs``` in your web browser. Here you can paste YouTube channel URLs at the top and press subscribe to add them. Click unsubscribe under a channel to remove it.
+7. Navigate to ```http://localhost:10003/list_subs``` in your web browser. Here you can paste YouTube channel URLs at the top and press subscribe to add them. Click unsubscribe under a channel to remove it.
 
-9. I suggest adding a daily cronjob to your crontab. Below is an example:
+8. I suggest adding a daily cronjob to your crontab. Below is an example:
 
 Create a run.sh in your pipefeeder directory like so:
 
