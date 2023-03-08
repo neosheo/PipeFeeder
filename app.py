@@ -1,19 +1,8 @@
 from flask import render_template, request, redirect
-from website import create_app
+from website import *
 from sqlalchemy import func
 from pipefeeder import *
-
-
-app, db = create_app()
-
-
-class Subs(db.Model):
-         channel_id = db.Column(db.String(24), primary_key=True)
-         channel_name = db.Column(db.String(35))
-         channel_url = db.Column(db.String(300))
-         channel_icon = db.Column(db.String(300))
-         def as_dict(self):
-	         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+import sqlite3
 
 
 @app.route('/', methods = ['GET'])
@@ -36,9 +25,25 @@ def addSub():
 	db.session.commit()
 	return redirect('/list_subs')
 
+
 @app.route('/del_sub', methods = ['POST'])
 def delSub():
 	db.session.query(Subs).filter_by(channel_id=request.form['unsubscribe']).delete()
 	db.session.commit()
 	subs_list = [sub.as_dict() for sub in Subs.query.order_by(func.lower(Subs.channel_name)).all()]
+	return redirect('/list_subs')
+
+
+@app.route('/backup', methods = ['GET'])
+def backup():
+	con = sqlite3.connect('website/instance/subs.db')
+	urls = con.cursor().execute('SELECT channel_url FROM subs')
+	with open('subs.bk', 'w') as f:
+		[f.write(f'{url[0]}\n') for url in urls.fetchall()]
+	return '<a href="/list_subs">Done!</a>'
+
+
+@app.route('/upload', methods = ['POST'])
+def upload():
+	populateDb(request.form['subs.txt'])
 	return redirect('/list_subs')

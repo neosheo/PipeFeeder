@@ -98,8 +98,8 @@ def downloadPlaylist():
 		subprocess.run(['./download_file.sh', f'{url.rstrip()}'])
 
 
-def populateDb():
-    with open('.subs', 'r') as f:
+def populateDb(text_file):
+    with open(text_file, 'r') as f:
         subs = f.readlines()
     subscriptions = []
     print('Gathering subscriptions...')
@@ -113,13 +113,12 @@ def populateDb():
     print('Done!')
     print('Updating database...')
     con = sqlite3.connect('website/instance/subs.db')
+	cur.execute('DROP TABLE subs')
+	cur.execute('VACUUM')
     cur = con.cursor()
-    cur.execute('CREATE TABLE subs(channel_id VARCHAR(24) PRIMARY KEY, channel_name VARCHAR(35), channel_url VARCHAR(300), channel_icon VARCHAR(300))') 
     cur.executemany('INSERT INTO subs(channel_id, channel_name, channel_url, channel_icon) VALUES (?, ?, ?, ?)', subscriptions)
     con.commit()
     print('Done!')
-#    res = cur.execute('SELECT * FROM subs')
-#    print(res.fetchall())
 
 
 if __name__ == '__main__':
