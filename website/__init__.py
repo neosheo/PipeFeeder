@@ -4,8 +4,18 @@ import os
 from pipefeeder import populateDb
 
 
+BACKUP_LOCATION = f'{os.getcwd()}/backup'
+ALLOWED_EXTENSIONS = {'txt'}
+
+
+def allowed_file(filename):
+	return '.' in filename and \
+		filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:////{os.getcwd()}/website/instance/subs.db'	
+app.config['UPLOAD_FOLDER'] = BACKUP_LOCATION
 db = SQLAlchemy(app)
 
 

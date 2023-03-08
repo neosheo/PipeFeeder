@@ -113,8 +113,6 @@ def populateDb(text_file):
     print('Done!')
     print('Updating database...')
     con = sqlite3.connect('website/instance/subs.db')
-	cur.execute('DROP TABLE subs')
-	cur.execute('VACUUM')
     cur = con.cursor()
     cur.executemany('INSERT INTO subs(channel_id, channel_name, channel_url, channel_icon) VALUES (?, ?, ?, ?)', subscriptions)
     con.commit()

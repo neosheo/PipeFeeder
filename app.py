@@ -1,4 +1,5 @@
 from flask import render_template, request, redirect
+from werkzeug.utils import secure_filename
 from website import *
 from sqlalchemy import func
 from pipefeeder import *
@@ -34,7 +35,7 @@ def delSub():
 	return redirect('/list_subs')
 
 
-@app.route('/backup', methods = ['GET'])
+@app.route('/backup_subs', methods = ['GET'])
 def backup():
 	con = sqlite3.connect('website/instance/subs.db')
 	urls = con.cursor().execute('SELECT channel_url FROM subs')
@@ -43,7 +44,18 @@ def backup():
 	return '<a href="/list_subs">Done!</a>'
 
 
-@app.route('/upload', methods = ['POST'])
+@app.route('/upload_subs', methods = ['GET', 'POST'])
 def upload():
-	populateDb(request.form['subs.txt'])
+	file = request.files['subs']
+	print(request.files)
+	print(file)
+	if file and allowed_file(file.filename):
+		filename = secure_filename(file.filename)
+		file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+		file.save(file_path)
+	populateDb(file_path)
 	return redirect('/list_subs')
+
+
+if __name__ == '__main__':
+	app.run(host='0.0.0.0', debug=True)

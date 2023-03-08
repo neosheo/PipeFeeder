@@ -14,12 +14,13 @@
 		<center><button type='submit'>Subscribe</button><center>
 	</form>
 	<br>
-	<form method='POST' action='/upload'>
-		<input type='file' id='subs' name='subs.txt'>
-		<input type='submit'>
+	<form method='POST' action='/upload_subs' enctype='multipart/form-data'>
+		<center><input type='file' id='subs' name='subs'></center>
+		<br>
+		<center><input type='submit' value='Upload'><center>
 	</form>
 	<br><br>
-	<center><a href='/backup'>Backup</a></center>
+	<center><a href='/backup_subs'>Backup</a></center>
 	<br>
 	<h1 align='center'>Channels you've subscribed to:</h1>
 	{% if subs %}
